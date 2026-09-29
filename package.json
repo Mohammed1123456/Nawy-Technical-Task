@@ -1,0 +1,24 @@
+{
+  "name": "practice-software-testing-taf",
+  "version": "1.0.0",
+  "description": "Practice Software Testing Automation Framework - Multi-module structure",
+  "private": true,
+  "workspaces": [
+    "Toolshop"
+  ],
+  "scripts": {
+    "test": "npm run test:toolshop",
+    "test:toolshop": "cd Toolshop && npm test",
+    "test:toolshop:chromium": "cd Toolshop && npm run test:chromium",
+    "test:toolshop:firefox": "cd Toolshop && npm run test:firefox",
+    "test:toolshop:edge": "cd Toolshop && npm run test:edge",
+    "report:toolshop": "cd Toolshop && npm run report",
+
+    "install:browsers": "npm run install:browsers:toolshop",
+    "install:browsers:toolshop": "cd Toolshop && npm run install:browsers"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}

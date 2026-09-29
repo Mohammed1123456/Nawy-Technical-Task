@@ -1,0 +1,44 @@
+{
+  "name": "toolshop-automation-framework",
+  "version": "1.0.0",
+  "description": "Practice Software Testing Automation Framework - Toolshop Module",
+  "private": true,
+  "scripts": {
+    "test": "playwright test --project=chromium --project=firefox",
+    "test:chromium": "playwright test --project=chromium",
+    "test:firefox": "playwright test --project=firefox",
+    "test:edge": "playwright test --project=edge",
+    "test:all-browsers": "playwright test",
+    "test:e2e": "playwright test specs/e2e --project=chromium --project=firefox",
+    "test:login": "playwright test specs/login --project=chromium --project=firefox",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "test:headed": "HEADLESS=false playwright test --project=chromium",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "report": "playwright show-report html-report",
+    "install:browsers": "playwright install --with-deps chromium firefox",
+    "install:edge": "playwright install msedge",
+    "codegen": "playwright codegen"
+  },
+  "keywords": [
+    "playwright",
+    "automation",
+    "testing",
+    "e2e",
+    "api",
+    "typescript"
+  ],
+  "author": "Mohamed Medhat",
+  "license": "ISC",
+  "devDependencies": {
+    "@faker-js/faker": "^10.6.0",
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^26.6.3",
+    "prettier": "^3.9.9",
+    "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "dotenv": "^18.0.4"
+  }
+}
