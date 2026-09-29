@@ -11,9 +11,7 @@ type Fixtures = {
 
 export const test = base.extend<Fixtures>({
   pagesManager: async ({ page }, use) => {
-    const pagesManager = new PagesManager(page);
-    await pagesManager.navigateToHome();
-    await use(pagesManager);
+    await use(new PagesManager(page));
   },
 
   // Anonymous API client - used for public endpoints (register, products)

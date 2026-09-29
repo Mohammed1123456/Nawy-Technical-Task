@@ -1,14 +1,7 @@
 import { expect, type Page, type Locator } from '@playwright/test';
 import { BasePage } from '../base-page';
 import { UserAddress } from '../../apis/users/users-api';
-
-export interface BillingAddress {
-  street: string;
-  city: string;
-  state: string;
-  country: string;
-  postal_code: string;
-}
+import { BillingAddress } from '../../apis/addresses/addresses-api';
 
 export class CheckoutPage extends BasePage {
   // Sign in step
@@ -53,50 +46,26 @@ export class CheckoutPage extends BasePage {
   }
 
   // Entering country + postal code + house number triggers the app's postcode
-  // lookup, which auto-fills street, city and state with the resolved address
+  // lookup, which auto-fills street, city and state
   async fillBillingAddress(
     address: Pick<UserAddress, 'country' | 'postal_code' | 'house_number'>
-  ): Promise<BillingAddress> {
-    const lookupResponse = this.page.waitForResponse(
-      response => {
-        const url = new URL(response.url());
-        return (
-          url.pathname.endsWith('/postcode-lookup') &&
-          url.searchParams.get('postcode') === address.postal_code &&
-          url.searchParams.get('house_number') === address.house_number
-        );
-      },
-      { timeout: 30000 }
-    );
-
+  ): Promise<void> {
     await this.selectOption(this.countrySelect, address.country);
     await this.fillField(this.postalCodeInput, address.postal_code);
     await this.fillField(this.houseNumberInput, address.house_number);
     await this.houseNumberInput.blur();
-
-    const response = await lookupResponse;
-    expect(response.status(), 'postcode lookup failed').toBe(200);
-    const resolved = (await response.json()) as BillingAddress;
-    await expect(this.streetInput).toHaveValue(resolved.street);
-    await expect(this.cityInput).toHaveValue(resolved.city);
-    await expect(this.stateInput).toHaveValue(resolved.state);
-
-    return this.getBillingAddress();
   }
 
-  async getBillingAddress(): Promise<BillingAddress> {
-    return {
-      street: await this.streetInput.inputValue(),
-      city: await this.cityInput.inputValue(),
-      state: await this.stateInput.inputValue(),
-      country: await this.countrySelect.inputValue(),
-      postal_code: await this.postalCodeInput.inputValue(),
-    };
+  async verifyBillingAddress(expected: BillingAddress): Promise<void> {
+    await expect(this.countrySelect).toHaveValue(expected.country);
+    await expect(this.postalCodeInput).toHaveValue(expected.postal_code);
+    await expect(this.streetInput).toHaveValue(expected.street);
+    await expect(this.cityInput).toHaveValue(expected.city);
+    await expect(this.stateInput).toHaveValue(expected.state);
   }
 
   async proceedFromBilling(): Promise<void> {
-    await expect(this.proceedFromBillingButton).toBeEnabled();
-    await this.proceedFromBillingButton.click();
+    await this.clickWhenEnabled(this.proceedFromBillingButton);
   }
 
   async selectPaymentMethod(paymentMethod: string): Promise<void> {
@@ -104,8 +73,7 @@ export class CheckoutPage extends BasePage {
   }
 
   async confirmPayment(): Promise<void> {
-    await expect(this.confirmButton).toBeEnabled();
-    await this.confirmButton.click();
+    await this.clickWhenEnabled(this.confirmButton);
   }
 
   async verifyPaymentSuccessMessage(message: string): Promise<void> {

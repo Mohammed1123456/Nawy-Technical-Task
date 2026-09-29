@@ -37,7 +37,3 @@ test.describe('Login', () => {
     await expect(page).toHaveURL(/\/auth\/login/);
   });
 });
-
-test.afterEach(async ({ pagesManager }) => {
-  await pagesManager.close();
-});

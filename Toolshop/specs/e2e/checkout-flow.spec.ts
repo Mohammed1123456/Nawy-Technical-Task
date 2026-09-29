@@ -2,7 +2,11 @@ import { test, expect } from '../../fixtures/fixtures';
 import { generateUser } from '../../data/user/user-data';
 import checkoutData from '../../data/checkout/checkout-data';
 import { UserResponse } from '../../apis/users/users-api';
-import { Cart } from '../../apis/carts/carts-api';
+import {
+  AddCartItemResponse,
+  Cart,
+  CreateCartResponse,
+} from '../../apis/carts/carts-api';
 import { InvoiceResponse } from '../../apis/invoices/invoices-api';
 
 test.describe('Checkout flow (API + UI)', () => {
@@ -67,7 +71,7 @@ test.describe('Checkout flow (API + UI)', () => {
           product.name
         );
 
-        const cart = await authApis.cartsApi.parseBody<{ id: string }>(
+        const cart = await authApis.cartsApi.parseBody<CreateCartResponse>(
           await authApis.cartsApi.createCart(),
           201
         );
@@ -78,9 +82,11 @@ test.describe('Checkout flow (API + UI)', () => {
           productToAdd.id,
           product.quantity
         );
-        const addItemBody = await authApis.cartsApi.parseBody<{
-          result: string;
-        }>(addItemResponse, 200);
+        const addItemBody =
+          await authApis.cartsApi.parseBody<AddCartItemResponse>(
+            addItemResponse,
+            200
+          );
         expect(addItemBody.result).toBe(checkoutData.cartItemAddedMessage);
 
         const updatedCart = await authApis.cartsApi.parseBody<Cart>(
@@ -107,7 +113,13 @@ test.describe('Checkout flow (API + UI)', () => {
 
         await checkoutPage.proceedFromSignIn();
 
-        const address = await checkoutPage.fillBillingAddress(user.address);
+        const address = await apisManager.addressesApi.resolveBillingAddress(
+          user.address.country,
+          user.address.postal_code,
+          user.address.house_number
+        );
+        await checkoutPage.fillBillingAddress(user.address);
+        await checkoutPage.verifyBillingAddress(address);
         await checkoutPage.proceedFromBilling();
 
         await checkoutPage.selectPaymentMethod(paymentMethod);
@@ -153,8 +165,4 @@ test.describe('Checkout flow (API + UI)', () => {
       expect(storedInvoice.invoice_number).toBe(invoice.invoice_number);
     });
   });
-});
-
-test.afterEach(async ({ pagesManager }) => {
-  await pagesManager.close();
 });

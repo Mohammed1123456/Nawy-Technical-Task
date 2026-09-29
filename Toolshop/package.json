@@ -19,7 +19,8 @@
     "report": "playwright show-report html-report",
     "install:browsers": "playwright install --with-deps chromium firefox",
     "install:edge": "playwright install msedge",
-    "codegen": "playwright codegen"
+    "codegen": "playwright codegen",
+    "lint": "eslint ."
   },
   "keywords": [
     "playwright",
@@ -32,11 +33,15 @@
   "author": "Mohamed Medhat",
   "license": "ISC",
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@faker-js/faker": "^10.6.0",
     "@playwright/test": "^1.63.0",
     "@types/node": "^26.6.3",
+    "eslint": "^10.11.0",
+    "eslint-plugin-playwright": "^2.12.0",
     "prettier": "^3.9.9",
-    "typescript": "^7.0.2"
+    "typescript": "~5.9",
+    "typescript-eslint": "^8.71.0"
   },
   "dependencies": {
     "dotenv": "^18.0.4"

@@ -3,13 +3,11 @@ import { BasePage } from '../base-page';
 
 export class CartPage extends BasePage {
   readonly cartRows: Locator;
-  readonly cartTotal: Locator;
   readonly proceedToCheckoutButton: Locator;
 
   constructor(page: Page) {
     super(page);
     this.cartRows = page.locator('table tbody tr');
-    this.cartTotal = page.getByTestId('cart-total');
     this.proceedToCheckoutButton = page.getByTestId('proceed-1');
   }
 

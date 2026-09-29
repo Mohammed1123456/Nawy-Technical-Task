@@ -8,6 +8,14 @@ export interface CartItem {
   product: { id: string; name: string };
 }
 
+export interface CreateCartResponse {
+  id: string;
+}
+
+export interface AddCartItemResponse {
+  result: string;
+}
+
 export interface Cart {
   id: string;
   cart_items: CartItem[];

@@ -22,10 +22,6 @@ export class PagesManager {
     this.checkoutPage = new CheckoutPage(page);
   }
 
-  async navigateToHome(): Promise<void> {
-    await this.page.goto('/', { waitUntil: 'domcontentloaded' });
-  }
-
   // The UI keeps the JWT of the logged-in user in localStorage
   async getAuthToken(): Promise<string> {
     const token = await this.page.evaluate(() =>
@@ -49,10 +45,9 @@ export class PagesManager {
       },
       { id: cartId, qty: quantity }
     );
-    await this.page.reload({ waitUntil: 'domcontentloaded' });
-  }
-
-  async close(): Promise<void> {
-    await this.page.close();
+    await this.homePage.openUntilReady(
+      () => this.page.reload(),
+      this.homePage.cartQuantity
+    );
   }
 }

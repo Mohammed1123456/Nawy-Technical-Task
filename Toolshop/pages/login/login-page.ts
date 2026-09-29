@@ -16,8 +16,10 @@ export class LoginPage extends BasePage {
   }
 
   async navigateToLogin(): Promise<void> {
-    await this.page.goto('/auth/login');
-    await this.waitElementToBeVisible(this.emailInput);
+    await this.openUntilReady(
+      () => this.page.goto('/auth/login'),
+      this.emailInput
+    );
   }
 
   async enterEmailAndPassword(email: string, password: string): Promise<void> {
