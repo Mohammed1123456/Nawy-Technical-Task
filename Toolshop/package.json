@@ -13,7 +13,7 @@
     "test:login": "playwright test specs/login --project=chromium --project=firefox",
     "test:ui": "playwright test --ui",
     "test:debug": "playwright test --debug",
-    "test:headed": "HEADLESS=false playwright test --project=chromium",
+    "test:headed": "playwright test --project=chromium --headed",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "report": "playwright show-report html-report",

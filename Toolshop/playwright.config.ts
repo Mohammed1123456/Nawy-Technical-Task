@@ -3,7 +3,7 @@ import environmentData from './data/environment/environment-data';
 
 export default defineConfig({
   testDir: './specs',
-  fullyParallel: true,
+  fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   // The public demo site throttles bursts of traffic, so keep parallelism modest
