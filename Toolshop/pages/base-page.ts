@@ -7,9 +7,6 @@ export abstract class BasePage {
     this.page = page;
   }
 
-  // Opens a page and waits until the app has rendered it. The public demo site
-  // occasionally fails to load a bootstrap asset (e.g. translations) and renders
-  // a blank shell, so the navigation is retried until the ready element appears.
   async openUntilReady(
     open: () => Promise<unknown>,
     readyLocator: Locator
@@ -20,7 +17,6 @@ export abstract class BasePage {
     }).toPass({ timeout: 45000 });
   }
 
-  // fill() auto-waits for the element to be editable and replaces its value
   async fillField(locator: Locator, value: string): Promise<void> {
     await locator.fill(value);
   }
@@ -29,7 +25,6 @@ export abstract class BasePage {
     await locator.selectOption(value);
   }
 
-  // Web-first assertion gives a clear failure when a step button stays disabled
   async clickWhenEnabled(locator: Locator): Promise<void> {
     await expect(locator).toBeEnabled();
     await locator.click();

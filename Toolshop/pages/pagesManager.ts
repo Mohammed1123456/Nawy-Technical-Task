@@ -22,7 +22,6 @@ export class PagesManager {
     this.checkoutPage = new CheckoutPage(page);
   }
 
-  // The UI keeps the JWT of the logged-in user in localStorage
   async getAuthToken(): Promise<string> {
     const token = await this.page.evaluate(() =>
       localStorage.getItem('auth-token')
@@ -35,8 +34,6 @@ export class PagesManager {
     return token;
   }
 
-  // The UI resolves the active cart from sessionStorage, so a cart created
-  // via the API has to be attached to the browser session to be checked out
   async attachCartToSession(cartId: string, quantity: number): Promise<void> {
     await this.page.evaluate(
       ({ id, qty }) => {

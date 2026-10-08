@@ -35,7 +35,6 @@ export class InvoicesApi extends BaseApi {
     return this.request.get(`/invoices/${invoiceId}`);
   }
 
-  // Sends the same request the UI makes when the order is confirmed
   async createInvoiceForCart(
     cartId: string,
     address: BillingAddress,

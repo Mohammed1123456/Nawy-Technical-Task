@@ -29,8 +29,6 @@ export class AddressesApi extends BaseApi {
     });
   }
 
-  // The invoice API only accepts addresses from this dataset, and the UI
-  // auto-fills the billing form from the same lookup
   async resolveBillingAddress(
     country: string,
     postcode: string,

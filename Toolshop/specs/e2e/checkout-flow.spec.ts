@@ -10,8 +10,6 @@ test.describe('Checkout flow (API + UI)', () => {
   }) => {
     const { product, paymentMethod } = checkoutData;
 
-    // Registration is part of the scenario here, so it runs as a visible step
-    // rather than through the registeredUser fixture
     const user = await test.step('1. Create a user via API', async () => {
       return apisManager.usersApi.registerUser(generateUser());
     });
@@ -27,7 +25,6 @@ test.describe('Checkout flow (API + UI)', () => {
           `${user.first_name} ${user.last_name}`
         );
 
-        // The session is established when the UI token authenticates the same user on the API
         const apis = await createAuthenticatedApis(
           await pagesManager.getAuthToken()
         );

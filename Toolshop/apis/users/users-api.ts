@@ -31,7 +31,6 @@ export interface UserResponse {
   address: Partial<UserAddress>;
 }
 
-// The generated credentials plus the id the API assigned to the new user
 export type RegisteredUser = RegisterUserRequest & { id: string };
 
 export class UsersApi extends BaseApi {
@@ -39,7 +38,6 @@ export class UsersApi extends BaseApi {
     return this.request.post('/users/register', { data: user });
   }
 
-  // Registers the user and verifies the API echoes the submitted data back
   async registerUser(user: RegisterUserRequest): Promise<RegisteredUser> {
     const body = await this.parseBody<UserResponse>(
       await this.register(user),

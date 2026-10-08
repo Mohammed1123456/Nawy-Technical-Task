@@ -4,11 +4,9 @@ import { UserAddress } from '../../apis/users/users-api';
 import { BillingAddress } from '../../apis/addresses/addresses-api';
 
 export class CheckoutPage extends BasePage {
-  // Sign in step
   readonly alreadyLoggedInMessage: Locator;
   readonly proceedFromSignInButton: Locator;
 
-  // Billing address step
   readonly countrySelect: Locator;
   readonly postalCodeInput: Locator;
   readonly houseNumberInput: Locator;
@@ -17,7 +15,6 @@ export class CheckoutPage extends BasePage {
   readonly stateInput: Locator;
   readonly proceedFromBillingButton: Locator;
 
-  // Payment step
   readonly paymentMethodSelect: Locator;
   readonly confirmButton: Locator;
   readonly paymentSuccessMessage: Locator;
@@ -45,8 +42,6 @@ export class CheckoutPage extends BasePage {
     await this.clickWhenEnabled(this.proceedFromSignInButton);
   }
 
-  // Entering country + postal code + house number triggers the app's postcode
-  // lookup, which auto-fills street, city and state
   async fillBillingAddress(
     address: Pick<UserAddress, 'country' | 'postal_code' | 'house_number'>
   ): Promise<void> {

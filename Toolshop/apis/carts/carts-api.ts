@@ -42,7 +42,6 @@ export class CartsApi extends BaseApi {
     return this.request.get(`/carts/${cartId}`);
   }
 
-  // Creates a cart, adds one product to it and verifies the stored cart content
   async createCartWithItem(productId: string, quantity: number): Promise<Cart> {
     const { id: cartId } = await this.parseBody<CreateCartResponse>(
       await this.createCart(),
