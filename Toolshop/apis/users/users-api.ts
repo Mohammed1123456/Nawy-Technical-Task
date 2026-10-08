@@ -1,4 +1,4 @@
-import { APIResponse } from '@playwright/test';
+import { APIResponse, expect } from '@playwright/test';
 import { BaseApi } from '../base-api';
 
 export interface UserAddress {
@@ -31,12 +31,44 @@ export interface UserResponse {
   address: Partial<UserAddress>;
 }
 
+// The generated credentials plus the id the API assigned to the new user
+export type RegisteredUser = RegisterUserRequest & { id: string };
+
 export class UsersApi extends BaseApi {
   async register(user: RegisterUserRequest): Promise<APIResponse> {
     return this.request.post('/users/register', { data: user });
   }
 
+  // Registers the user and verifies the API echoes the submitted data back
+  async registerUser(user: RegisterUserRequest): Promise<RegisteredUser> {
+    const body = await this.parseBody<UserResponse>(
+      await this.register(user),
+      201
+    );
+
+    expect(body.id).toBeTruthy();
+    expect(body).toMatchObject({
+      first_name: user.first_name,
+      last_name: user.last_name,
+      email: user.email,
+      phone: user.phone,
+      dob: user.dob,
+    });
+    expect(body.address).toMatchObject({
+      street: user.address.street,
+      city: user.address.city,
+      country: user.address.country,
+    });
+    expect(body).not.toHaveProperty('password');
+
+    return { ...user, id: body.id };
+  }
+
   async getCurrentUser(): Promise<APIResponse> {
     return this.request.get('/users/me');
+  }
+
+  async getCurrentUserProfile(): Promise<UserResponse> {
+    return this.parseBody<UserResponse>(await this.getCurrentUser(), 200);
   }
 }

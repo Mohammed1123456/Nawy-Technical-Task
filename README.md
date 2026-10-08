@@ -71,6 +71,8 @@ Practice-Software-Testing-TAF/
   - `pagesManager` exposes all page objects.
   - `apisManager` is an anonymous API client.
   - `createAuthenticatedApis(token)` is a factory that creates bearer-authenticated API contexts and disposes of them automatically.
+  - `registeredUser` registers a new user via API and returns the credentials plus the new user's `id`. Tests that only need a user as setup use it, such as the login spec.
+- **Scenario state stays in the spec:** page objects and API clients don't store data between calls. Each `test.step` returns its output, such as the user, the cart id or the billing address, and the next step uses it as a typed `const`. Multi-call API sequences live in client helpers like `registerUser`, `createCartWithItem` and `createInvoiceForCart`, so the spec reads as the business flow.
 - **Locators:** the app exposes `data-test` attributes, so `testIdAttribute` is set to `data-test` and locators use `getByTestId`. Role and text locators are used where no test id exists.
 - **No hard-coded waits:** synchronization relies only on Playwright auto-waiting, web-first assertions (`toHaveValue`, `toBeEnabled`, `toBeVisible`) and `waitForURL`. There is no `waitForTimeout` anywhere, and ESLint enforces this.
 - **Resilience to the public site:** the demo site sometimes fails to load a startup asset and shows a blank page. `BasePage.openUntilReady` retries the navigation (using `expect(...).toPass()`) until the page's key element is visible, so a bad page load doesn't fail the test.

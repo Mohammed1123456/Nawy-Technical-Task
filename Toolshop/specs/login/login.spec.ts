@@ -1,5 +1,5 @@
 import { test, expect } from '../../fixtures/fixtures';
-import userData, { generateUser } from '../../data/user/user-data';
+import userData from '../../data/user/user-data';
 
 test.beforeEach(async ({ pagesManager }) => {
   await pagesManager.loginPage.navigateToLogin();
@@ -8,18 +8,15 @@ test.beforeEach(async ({ pagesManager }) => {
 test.describe('Login', () => {
   test('User registered via API can log in via UI', async ({
     pagesManager,
-    apisManager,
+    registeredUser,
   }) => {
-    const user = generateUser();
-    await apisManager.usersApi.expectStatus(
-      await apisManager.usersApi.register(user),
-      201
+    await pagesManager.loginPage.login(
+      registeredUser.email,
+      registeredUser.password
     );
-
-    await pagesManager.loginPage.login(user.email, user.password);
     await pagesManager.accountPage.verifyAccountPageIsDisplayed();
     await pagesManager.homePage.verifyLoggedInUser(
-      `${user.first_name} ${user.last_name}`
+      `${registeredUser.first_name} ${registeredUser.last_name}`
     );
     expect(await pagesManager.getAuthToken()).toBeTruthy();
   });

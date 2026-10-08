@@ -1,5 +1,7 @@
-import { APIResponse } from '@playwright/test';
+import { APIResponse, expect } from '@playwright/test';
 import { BaseApi } from '../base-api';
+
+const ITEM_ADDED_MESSAGE = 'item added or updated';
 
 export interface CartItem {
   id: string;
@@ -38,5 +40,28 @@ export class CartsApi extends BaseApi {
 
   async getCart(cartId: string): Promise<APIResponse> {
     return this.request.get(`/carts/${cartId}`);
+  }
+
+  // Creates a cart, adds one product to it and verifies the stored cart content
+  async createCartWithItem(productId: string, quantity: number): Promise<Cart> {
+    const { id: cartId } = await this.parseBody<CreateCartResponse>(
+      await this.createCart(),
+      201
+    );
+    expect(cartId).toBeTruthy();
+
+    const { result } = await this.parseBody<AddCartItemResponse>(
+      await this.addItem(cartId, productId, quantity),
+      200
+    );
+    expect(result).toBe(ITEM_ADDED_MESSAGE);
+
+    const cart = await this.parseBody<Cart>(await this.getCart(cartId), 200);
+    expect(cart.cart_items).toHaveLength(1);
+    expect(cart.cart_items[0]).toMatchObject({
+      product_id: productId,
+      quantity,
+    });
+    return cart;
   }
 }

@@ -1,12 +1,15 @@
 import { test as base } from '@playwright/test';
 import { PagesManager } from '../pages/pagesManager';
 import { ApisManager } from '../apis/apisManager';
+import { RegisteredUser } from '../apis/users/users-api';
 import environmentData from '../data/environment/environment-data';
+import { generateUser } from '../data/user/user-data';
 
 type Fixtures = {
   pagesManager: PagesManager;
   apisManager: ApisManager;
   createAuthenticatedApis: (token: string) => Promise<ApisManager>;
+  registeredUser: RegisteredUser;
 };
 
 export const test = base.extend<Fixtures>({
@@ -37,6 +40,11 @@ export const test = base.extend<Fixtures>({
       return apisManager;
     });
     await Promise.all(created.map(apisManager => apisManager.dispose()));
+  },
+
+  // A brand-new user registered via API, for tests where registration is setup
+  registeredUser: async ({ apisManager }, use) => {
+    await use(await apisManager.usersApi.registerUser(generateUser()));
   },
 });
 

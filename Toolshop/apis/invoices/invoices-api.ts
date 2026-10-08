@@ -1,5 +1,6 @@
 import { APIResponse } from '@playwright/test';
 import { BaseApi } from '../base-api';
+import { BillingAddress } from '../addresses/addresses-api';
 
 export interface CreateInvoiceRequest {
   billing_street: string;
@@ -32,5 +33,33 @@ export class InvoicesApi extends BaseApi {
 
   async getInvoice(invoiceId: string): Promise<APIResponse> {
     return this.request.get(`/invoices/${invoiceId}`);
+  }
+
+  // Sends the same request the UI makes when the order is confirmed
+  async createInvoiceForCart(
+    cartId: string,
+    address: BillingAddress,
+    paymentMethod: string
+  ): Promise<InvoiceResponse> {
+    return this.parseBody<InvoiceResponse>(
+      await this.createInvoice({
+        billing_street: address.street,
+        billing_city: address.city,
+        billing_state: address.state,
+        billing_country: address.country,
+        billing_postal_code: address.postal_code,
+        payment_method: paymentMethod,
+        payment_details: {},
+        cart_id: cartId,
+      }),
+      201
+    );
+  }
+
+  async getInvoiceById(invoiceId: string): Promise<InvoiceResponse> {
+    return this.parseBody<InvoiceResponse>(
+      await this.getInvoice(invoiceId),
+      200
+    );
   }
 }

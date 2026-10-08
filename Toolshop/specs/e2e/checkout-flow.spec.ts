@@ -1,13 +1,6 @@
 import { test, expect } from '../../fixtures/fixtures';
 import { generateUser } from '../../data/user/user-data';
 import checkoutData from '../../data/checkout/checkout-data';
-import { UserResponse } from '../../apis/users/users-api';
-import {
-  AddCartItemResponse,
-  Cart,
-  CreateCartResponse,
-} from '../../apis/carts/carts-api';
-import { InvoiceResponse } from '../../apis/invoices/invoices-api';
 
 test.describe('Checkout flow (API + UI)', () => {
   test('Registered user buys "Ear Protection" with cash on delivery and gets an invoice', async ({
@@ -15,34 +8,13 @@ test.describe('Checkout flow (API + UI)', () => {
     apisManager,
     createAuthenticatedApis,
   }) => {
-    const user = generateUser();
-    const fullName = `${user.first_name} ${user.last_name}`;
     const { product, paymentMethod } = checkoutData;
 
-    const registeredUser =
-      await test.step('1. Create a user via API', async () => {
-        const response = await apisManager.usersApi.register(user);
-        const body = await apisManager.usersApi.parseBody<UserResponse>(
-          response,
-          201
-        );
-
-        expect(body.id).toBeTruthy();
-        expect(body).toMatchObject({
-          first_name: user.first_name,
-          last_name: user.last_name,
-          email: user.email,
-          phone: user.phone,
-          dob: user.dob,
-        });
-        expect(body.address).toMatchObject({
-          street: user.address.street,
-          city: user.address.city,
-          country: user.address.country,
-        });
-        expect(body).not.toHaveProperty('password');
-        return body;
-      });
+    // Registration is part of the scenario here, so it runs as a visible step
+    // rather than through the registeredUser fixture
+    const user = await test.step('1. Create a user via API', async () => {
+      return apisManager.usersApi.registerUser(generateUser());
+    });
 
     const authApis =
       await test.step('2. Log in via UI using the same credentials', async () => {
@@ -51,53 +23,28 @@ test.describe('Checkout flow (API + UI)', () => {
         await loginPage.login(user.email, user.password);
 
         await accountPage.verifyAccountPageIsDisplayed();
-        await homePage.verifyLoggedInUser(fullName);
+        await homePage.verifyLoggedInUser(
+          `${user.first_name} ${user.last_name}`
+        );
 
         // The session is established when the UI token authenticates the same user on the API
-        const token = await pagesManager.getAuthToken();
-        const apis = await createAuthenticatedApis(token);
-        const me = await apis.usersApi.parseBody<UserResponse>(
-          await apis.usersApi.getCurrentUser(),
-          200
+        const apis = await createAuthenticatedApis(
+          await pagesManager.getAuthToken()
         );
-        expect(me.id).toBe(registeredUser.id);
+        const me = await apis.usersApi.getCurrentUserProfile();
+        expect(me.id).toBe(user.id);
         expect(me.email).toBe(user.email);
         return apis;
       });
 
     const cartId =
       await test.step(`3. Add "${product.name}" to cart via API`, async () => {
-        const productToAdd = await apisManager.productsApi.getProductByName(
-          product.name
-        );
-
-        const cart = await authApis.cartsApi.parseBody<CreateCartResponse>(
-          await authApis.cartsApi.createCart(),
-          201
-        );
-        expect(cart.id).toBeTruthy();
-
-        const addItemResponse = await authApis.cartsApi.addItem(
-          cart.id,
-          productToAdd.id,
+        const { id: productId } =
+          await apisManager.productsApi.getProductByName(product.name);
+        const cart = await authApis.cartsApi.createCartWithItem(
+          productId,
           product.quantity
         );
-        const addItemBody =
-          await authApis.cartsApi.parseBody<AddCartItemResponse>(
-            addItemResponse,
-            200
-          );
-        expect(addItemBody.result).toBe(checkoutData.cartItemAddedMessage);
-
-        const updatedCart = await authApis.cartsApi.parseBody<Cart>(
-          await authApis.cartsApi.getCart(cart.id),
-          200
-        );
-        expect(updatedCart.cart_items).toHaveLength(1);
-        expect(updatedCart.cart_items[0]).toMatchObject({
-          product_id: productToAdd.id,
-          quantity: product.quantity,
-        });
         return cart.id;
       });
 
@@ -131,24 +78,15 @@ test.describe('Checkout flow (API + UI)', () => {
       });
 
     await test.step('5. Create invoice via API', async () => {
-      const response = await authApis.invoicesApi.createInvoice({
-        billing_street: billingAddress.street,
-        billing_city: billingAddress.city,
-        billing_state: billingAddress.state,
-        billing_country: billingAddress.country,
-        billing_postal_code: billingAddress.postal_code,
-        payment_method: paymentMethod,
-        payment_details: {},
-        cart_id: cartId,
-      });
-      const invoice = await authApis.invoicesApi.parseBody<InvoiceResponse>(
-        response,
-        201
+      const invoice = await authApis.invoicesApi.createInvoiceForCart(
+        cartId,
+        billingAddress,
+        paymentMethod
       );
 
       expect(invoice.id).toBeTruthy();
       expect(invoice.invoice_number).toMatch(checkoutData.invoiceNumberPattern);
-      expect(invoice.user_id).toBe(registeredUser.id);
+      expect(invoice.user_id).toBe(user.id);
       expect(invoice).toMatchObject({
         billing_street: billingAddress.street,
         billing_city: billingAddress.city,
@@ -157,11 +95,9 @@ test.describe('Checkout flow (API + UI)', () => {
         billing_postal_code: billingAddress.postal_code,
       });
 
-      const storedInvoice =
-        await authApis.invoicesApi.parseBody<InvoiceResponse>(
-          await authApis.invoicesApi.getInvoice(invoice.id),
-          200
-        );
+      const storedInvoice = await authApis.invoicesApi.getInvoiceById(
+        invoice.id
+      );
       expect(storedInvoice.invoice_number).toBe(invoice.invoice_number);
     });
   });

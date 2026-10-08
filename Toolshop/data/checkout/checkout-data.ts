@@ -5,6 +5,5 @@ export default {
   },
   paymentMethod: 'cash-on-delivery',
   paymentSuccessMessage: 'Payment was successful',
-  cartItemAddedMessage: 'item added or updated',
   invoiceNumberPattern: /^INV-\d+$/,
 };
