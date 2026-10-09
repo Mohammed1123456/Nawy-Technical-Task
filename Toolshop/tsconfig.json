@@ -11,13 +11,6 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "noEmit": true,
-    "paths": {
-      "@specs/*": ["./specs/*"],
-      "@pages/*": ["./pages/*"],
-      "@apis/*": ["./apis/*"],
-      "@fixtures/*": ["./fixtures/*"],
-      "@data/*": ["./data/*"]
-    },
     "types": ["node"]
   },
   "include": [

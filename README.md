@@ -79,14 +79,14 @@ Practice-Software-Testing-TAF/
 - **Test data isolation:** each run registers a new user with a unique email (timestamp + random suffix), so tests are independent and safe to run in parallel. The product is looked up by name because the demo site resets its database and product IDs change.
 
 ## Prerequisites
-- Node.js 18+ (20 recommended)
-- npm 8+
+- Node.js 20.19+ (22 LTS recommended). `@faker-js/faker` v10 and ESLint 10 don't load on older versions.
+- npm 10+
 
 ## Installation
 
 ```bash
-git clone <this-repo-url>
-cd Practice-Software-Testing-TAF
+git clone https://github.com/Mohammed1123456/Nawy-Technical-Task.git
+cd Nawy-Technical-Task
 
 # Install dependencies for all modules (npm workspaces)
 npm install
@@ -137,12 +137,13 @@ npx playwright test --project=chromium --project=firefox   # any combination
 ```
 
 ## Parallel Execution
-- `fullyParallel: true`: every test, including the same test in different browsers, runs in its own worker.
-- The default is **2 workers**, because the public demo site throttles bursts of traffic. Override it per run:
+- `fullyParallel: false`: spec files run in parallel across workers, and each browser project counts separately. Tests inside one file run one after another in the same worker. This keeps bursts of traffic to the public demo site low.
+- The default is **2 workers**, for the same reason. Override it per run:
 
 ```bash
-WORKERS=4 npm test
-npx playwright test --workers=4
+npx playwright test --workers=4       # any shell
+WORKERS=4 npm test                    # macOS / Linux
+$env:WORKERS=4; npm test              # Windows PowerShell
 ```
 
 ## Reports & Failure Artifacts
