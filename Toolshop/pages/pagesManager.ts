@@ -4,6 +4,8 @@ import { HomePage } from './home-page/home-page';
 import { AccountPage } from './account/account-page';
 import { CartPage } from './checkout/cart-page';
 import { CheckoutPage } from './checkout/checkout-page';
+import { RegisterPage } from './register/register-page';
+import { ProductPage } from './product/product-page';
 
 export class PagesManager {
   readonly page: Page;
@@ -12,6 +14,8 @@ export class PagesManager {
   readonly accountPage: AccountPage;
   readonly cartPage: CartPage;
   readonly checkoutPage: CheckoutPage;
+  readonly registerPage: RegisterPage;
+  readonly productPage: ProductPage;
 
   constructor(page: Page) {
     this.page = page;
@@ -20,6 +24,8 @@ export class PagesManager {
     this.accountPage = new AccountPage(page);
     this.cartPage = new CartPage(page);
     this.checkoutPage = new CheckoutPage(page);
+    this.registerPage = new RegisterPage(page);
+    this.productPage = new ProductPage(page);
   }
 
   async getAuthToken(): Promise<string> {

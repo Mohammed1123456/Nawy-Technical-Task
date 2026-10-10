@@ -21,6 +21,13 @@ It automates an end-to-end purchase flow that combines **API** and **UI** steps,
 - **API → UI:** the API-created cart is attached to the browser session (`sessionStorage.cart_id`), which is where the web app looks up the active cart.
 - **API ↔ UI:** the billing address comes from the postcode-lookup API (`GET /postcode-lookup`). The test checks that the UI billing form shows the same address, then uses it for the invoice. The invoice API rejects addresses outside its postcode dataset, so this is required.
 
+The same purchase is also covered by two single-layer specs. They're written as flat tests without `test.step`; each line is one page or API method:
+
+| Spec | Flow |
+|---|---|
+| `specs/e2e/checkout-flow-api.spec.ts` | **API only:** register → `POST /users/login` for a token → `GET /users/me` → product search → cart → postcode lookup → `POST /invoices` → `GET /invoices/{id}` |
+| `specs/e2e/checkout-flow-ui.spec.ts` | **UI only:** register form (address auto-filled by postcode lookup) → login → search → product page → add to cart → checkout → **second Confirm creates the invoice** → "Thanks for your order! Your invoice number is INV-…" |
+
 `Toolshop/specs/login/login.spec.ts` adds three independent tests: a positive login for an API-registered user, a negative login with invalid credentials, and a logout that starts from an already logged-in session.
 
 ## Project Structure

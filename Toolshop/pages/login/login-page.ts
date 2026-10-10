@@ -22,6 +22,11 @@ export class LoginPage extends BasePage {
     );
   }
 
+  async verifyLoginPageIsDisplayed(): Promise<void> {
+    await this.page.waitForURL(/\/auth\/login$/);
+    await expect(this.emailInput).toBeVisible();
+  }
+
   async enterEmailAndPassword(email: string, password: string): Promise<void> {
     await this.fillField(this.emailInput, email);
     await this.fillField(this.passwordInput, password);

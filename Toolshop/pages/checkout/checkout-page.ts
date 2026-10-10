@@ -18,6 +18,7 @@ export class CheckoutPage extends BasePage {
   readonly paymentMethodSelect: Locator;
   readonly confirmButton: Locator;
   readonly paymentSuccessMessage: Locator;
+  readonly orderConfirmation: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -35,6 +36,7 @@ export class CheckoutPage extends BasePage {
     this.paymentMethodSelect = page.getByTestId('payment-method');
     this.confirmButton = page.getByTestId('finish');
     this.paymentSuccessMessage = page.getByTestId('payment-success-message');
+    this.orderConfirmation = page.locator('#order-confirmation');
   }
 
   async proceedFromSignIn(): Promise<void> {
@@ -59,6 +61,12 @@ export class CheckoutPage extends BasePage {
     await expect(this.stateInput).toHaveValue(expected.state);
   }
 
+  async verifyBillingAddressIsAutofilled(): Promise<void> {
+    await expect(this.streetInput).not.toHaveValue('');
+    await expect(this.cityInput).not.toHaveValue('');
+    await expect(this.stateInput).not.toHaveValue('');
+  }
+
   async proceedFromBilling(): Promise<void> {
     await this.clickWhenEnabled(this.proceedFromBillingButton);
   }
@@ -73,5 +81,13 @@ export class CheckoutPage extends BasePage {
 
   async verifyPaymentSuccessMessage(message: string): Promise<void> {
     await expect(this.paymentSuccessMessage).toHaveText(message);
+  }
+
+  async confirmOrder(): Promise<void> {
+    await this.clickWhenEnabled(this.confirmButton);
+  }
+
+  async verifyOrderConfirmation(pattern: RegExp): Promise<void> {
+    await expect(this.orderConfirmation).toHaveText(pattern);
   }
 }

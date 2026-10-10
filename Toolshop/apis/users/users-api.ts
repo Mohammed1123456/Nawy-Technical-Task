@@ -33,6 +33,12 @@ export interface UserResponse {
 
 export type RegisteredUser = RegisterUserRequest & { id: string };
 
+export interface LoginResponse {
+  access_token: string;
+  token_type: string;
+  expires_in: number;
+}
+
 export class UsersApi extends BaseApi {
   async register(user: RegisterUserRequest): Promise<APIResponse> {
     return this.request.post('/users/register', { data: user });
@@ -60,6 +66,19 @@ export class UsersApi extends BaseApi {
     expect(body).not.toHaveProperty('password');
 
     return { ...user, id: body.id };
+  }
+
+  async login(email: string, password: string): Promise<APIResponse> {
+    return this.request.post('/users/login', { data: { email, password } });
+  }
+
+  async loginUser(email: string, password: string): Promise<string> {
+    const { access_token } = await this.parseBody<LoginResponse>(
+      await this.login(email, password),
+      200
+    );
+    expect(access_token).toBeTruthy();
+    return access_token;
   }
 
   async getCurrentUser(): Promise<APIResponse> {
