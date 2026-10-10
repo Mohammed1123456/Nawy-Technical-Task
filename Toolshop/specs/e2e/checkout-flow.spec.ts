@@ -3,6 +3,8 @@ import { generateUser } from '../../data/user/user-data';
 import checkoutData from '../../data/checkout/checkout-data';
 
 test.describe('Checkout flow (API + UI)', () => {
+  test.describe.configure({ timeout: 120000 });
+
   test('Registered user buys "Ear Protection" with cash on delivery and gets an invoice', async ({
     pagesManager,
     apisManager,

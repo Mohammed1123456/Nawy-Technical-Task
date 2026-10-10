@@ -10,6 +10,7 @@ type Fixtures = {
   apisManager: ApisManager;
   createAuthenticatedApis: (token: string) => Promise<ApisManager>;
   registeredUser: RegisteredUser;
+  loggedInUser: RegisteredUser;
 };
 
 export const test = base.extend<Fixtures>({
@@ -45,6 +46,15 @@ export const test = base.extend<Fixtures>({
   // A brand-new user registered via API, for tests where registration is setup
   registeredUser: async ({ apisManager }, use) => {
     await use(await apisManager.usersApi.registerUser(generateUser()));
+  },
+
+  // A registered user already logged in via UI, for tests that start from an authenticated page
+  loggedInUser: async ({ registeredUser, pagesManager }, use) => {
+    const { loginPage, accountPage } = pagesManager;
+    await loginPage.navigateToLogin();
+    await loginPage.login(registeredUser.email, registeredUser.password);
+    await accountPage.verifyAccountPageIsDisplayed();
+    await use(registeredUser);
   },
 });
 

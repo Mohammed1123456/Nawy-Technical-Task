@@ -21,7 +21,7 @@ It automates an end-to-end purchase flow that combines **API** and **UI** steps,
 - **API → UI:** the API-created cart is attached to the browser session (`sessionStorage.cart_id`), which is where the web app looks up the active cart.
 - **API ↔ UI:** the billing address comes from the postcode-lookup API (`GET /postcode-lookup`). The test checks that the UI billing form shows the same address, then uses it for the invoice. The invoice API rejects addresses outside its postcode dataset, so this is required.
 
-`Toolshop/specs/login/login.spec.ts` adds two independent tests: a positive login for an API-registered user, and a negative login with invalid credentials.
+`Toolshop/specs/login/login.spec.ts` adds three independent tests: a positive login for an API-registered user, a negative login with invalid credentials, and a logout that starts from an already logged-in session.
 
 ## Project Structure
 
@@ -72,6 +72,7 @@ Practice-Software-Testing-TAF/
   - `apisManager` is an anonymous API client.
   - `createAuthenticatedApis(token)` is a factory that creates bearer-authenticated API contexts and disposes of them automatically.
   - `registeredUser` registers a new user via API and returns the credentials plus the new user's `id`. Tests that only need a user as setup use it, such as the login spec.
+  - `loggedInUser` builds on `registeredUser` and logs that user in through the UI. Tests that start from an authenticated page just request it, as the logout test does, and the login happens as part of the fixture setup.
 - **Scenario state stays in the spec:** page objects and API clients don't store data between calls. Each `test.step` returns its output, such as the user, the cart id or the billing address, and the next step uses it as a typed `const`. Multi-call API sequences live in client helpers like `registerUser`, `createCartWithItem` and `createInvoiceForCart`, so the spec reads as the business flow.
 - **Locators:** the app exposes `data-test` attributes, so `testIdAttribute` is set to `data-test` and locators use `getByTestId`. Role and text locators are used where no test id exists.
 - **No hard-coded waits:** synchronization relies only on Playwright auto-waiting, web-first assertions (`toHaveValue`, `toBeEnabled`, `toBeVisible`) and `waitForURL`. There is no `waitForTimeout` anywhere, and ESLint enforces this.

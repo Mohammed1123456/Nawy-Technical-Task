@@ -1,11 +1,11 @@
 import { test, expect } from '../../fixtures/fixtures';
 import userData from '../../data/user/user-data';
 
-test.beforeEach(async ({ pagesManager }) => {
-  await pagesManager.loginPage.navigateToLogin();
-});
-
 test.describe('Login', () => {
+  test.beforeEach('Open the login page', async ({ pagesManager }) => {
+    await pagesManager.loginPage.navigateToLogin();
+  });
+
   test('User registered via API can log in via UI', async ({
     pagesManager,
     registeredUser,
@@ -32,5 +32,20 @@ test.describe('Login', () => {
       userData.invalidLoginMessage
     );
     await expect(page).toHaveURL(/\/auth\/login/);
+  });
+});
+
+test.describe('Logout', () => {
+  test('Logged-in user can sign out', async ({
+    pagesManager,
+    loggedInUser,
+  }) => {
+    const { homePage } = pagesManager;
+    await homePage.verifyLoggedInUser(
+      `${loggedInUser.first_name} ${loggedInUser.last_name}`
+    );
+
+    await homePage.signOut();
+    await homePage.verifyLoggedOut();
   });
 });
